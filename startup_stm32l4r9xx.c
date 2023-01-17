@@ -6,11 +6,11 @@
 
 #define STACK_START SRAM_END
 
-extern uint32_t  _sidata;
-extern uint32_t  _sdata;
-extern uint32_t  _edata
-extern uint32_t  _sbss
-extern uint32_t  _ebss
+extern uint8_t _sidata[];
+extern uint8_t _sdata[];
+extern uint8_t _edata[];
+extern uint8_t _sbss[];
+extern uint8_t _ebss[];
 
 int main(void);
 
@@ -242,10 +242,10 @@ void Default_Handler(void) __attrbuite__((section(".text.Default_Hanlder")))
 void Reset_Handler(void) __attribute__((section(".text.Reset_Handler")))
 {
     // Copy the .data section to SRAM
-    uint32_t size = (uint32_t)&_edata - (uint32_t)&_sdata;
+    uint32_t size = (uint32_t)_edata - (uint32_t)_sdata;
 
-    uint8_t *pDst = (uint8_t)&_sdata;   //FIXME: sram
-    uint8_t *pSrc = (uint8_t)&_la_data; //FIXME: flash
+    uint8_t *pDst = (uint8_t*)_sdata;   //sram
+    uint8_t *pSrc = (uint8_t*)_sidata;  //flash
 
     for (uint32_t i = 0; i < size; i++)
     {
@@ -253,14 +253,14 @@ void Reset_Handler(void) __attribute__((section(".text.Reset_Handler")))
     }
 
     // Init the .bss section to zero in SRAM
-    size = (uint32_t)&_ebss - (uint32_t)&_sbss;
-    pDst = (uint8_t*)&sbss;
+    size = (uint32_t)_ebss - (uint32_t)_sbss;
+    pDst = (uint8_t*)_sbss;
     for (uint32_t i = 0; i < size; i++)
     {
         *pDst++ = 0;
     }
 
-    SystemInit();
+    /* SystemInit(); */
 
     __libc_init_array();
 
