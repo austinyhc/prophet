@@ -121,7 +121,7 @@ void DMAMUX1_OVR_IRQHandler         (void) __attribute__ ((weak, alias("Default_
 
 
 uint32_t vectors[] __attribute__((section(".isr_vector"))) = {
-    STACK_START, // FIXME: .word   _estack
+    STACK_START,
     (uint32_t)Reset_Handler,
     (uint32_t)NMI_Handler,
     (uint32_t)HardFault_Handler,
@@ -133,7 +133,7 @@ uint32_t vectors[] __attribute__((section(".isr_vector"))) = {
     0,
     0,
     (uint32_t)SVC_Handler,
-    (uint32_t)DebugMon_Handler
+    (uint32_t)DebugMon_Handler,
     0,
     (uint32_t)PendSV_Handler,
     (uint32_t)SysTick_Handler,
@@ -234,12 +234,15 @@ uint32_t vectors[] __attribute__((section(".isr_vector"))) = {
     (uint32_t)DMAMUX1_OVR_IRQHandler,
 };
 
-void Default_Handler(void) __attrbuite__((section(".text.Default_Hanlder")))
+
+__attribute__((section (".text.Default_Handler"))) void Default_Handler(void)
+/* void Default_Handler(void) */
 {
     while(1);
 }
 
-void Reset_Handler(void) __attribute__((section(".text.Reset_Handler")))
+__attribute__((section (".text.Reset_Handler"))) void Reset_Handler(void)
+/* void Reset_Handler(void) */
 {
     // Copy the .data section to SRAM
     uint32_t size = (uint32_t)_edata - (uint32_t)_sdata;
