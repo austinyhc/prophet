@@ -11,8 +11,8 @@
 //  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 //#endif
 
-#include<stdio.h>
-#include"main.h"
+#include <stdio.h>
+#include "main.h"
 #include "led.h"
 
 void task1_handler(void); //This is task1
@@ -39,6 +39,7 @@ uint32_t g_tick_count = 0;
 const uint32_t const_v_1 = 100;
 const uint32_t const_v_2 = 100;
 const uint8_t const_V_3 = 100;
+
 typedef struct
 {
 	uint32_t psp_value;
@@ -133,8 +134,6 @@ void task4_handler(void)
 		led_off(LED_RED);
 		task_delay(125);
 	}
-
-
 }
 
 

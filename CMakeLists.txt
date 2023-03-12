@@ -6,7 +6,7 @@ include(./gcc-arm-none-eabi.cmake)
 
 # Set project name and some defaults
 if ("${PROJECT_NAME}" STREQUAL "")
-    set(PROJECT_NAME firmware)
+    set(PROJECT_NAME prophet)
 endif()
 project(${PROJECT_NAME})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -18,16 +18,18 @@ endif()
 message("Build type: ${CMAKE_BUILD_TYPE}")
 
 # Set microcontroller information
-set(MCU_FAMILY STM32F4xx)
-set(MCU_MODEL STM32F407xx)
+set(MCU_FAMILY stm32l4xx)
+set(MCU_MODEL STM32L4R9xx)
+set(BOARD_MODEL STWIN)
+
 set(CPU_PARAMETERS
     -mcpu=cortex-m4
     -mthumb
     -mfpu=fpv4-sp-d16
     -mfloat-abi=hard)
 
-set(STARTUP_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/CubeMX/startup_stm32f407xx.s)
-set(MCU_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/CubeMX/STM32F407VGTx_FLASH.ld)
+set(STARTUP_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/startup_stm32l4r9xx.c)
+set(MCU_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/stm32l4r9xx.ld)
 
 ###############################################################################
 set(EXECUTABLE ${CMAKE_PROJECT_NAME})
@@ -42,26 +44,31 @@ set(CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES ${CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTOR
 set(CMAKE_CXX_EXTENSIONS ON)
 ###############################################################################
 
-set(STM32CUBEMX_INCLUDE_DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${MCU_FAMILY}_HAL_Driver/Inc
-    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/${MCU_FAMILY}_HAL_Driver/Inc/Legacy
-    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Device/ST/${MCU_FAMILY}/Include
-    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/Include)
+set(DRIVER_INCLUDE_DIRECTORIES
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc/Legacy
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/board/${BOARD_MODEL}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/hts221
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/ism330dhcx
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/lps22hh
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cpu
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis)
 
 set(PROJECT_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
-file(GLOB_RECURSE STM32CUBEMX_SOURCES CONFIGURE_DEPENDS
-    ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/*.c)
+file(GLOB_RECURSE DRIVER_SOURCES CONFIGURE_DEPENDS
+    # ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/*.c)
 
-set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Project)
+set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app)
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     ${PROJECT_DIR}/*.cpp
     ${PROJECT_DIR}/*.c)
 
 add_executable(${EXECUTABLE}
-    ${STM32CUBEMX_SOURCES}
+    ${DRIVER_SOURCES}
     ${PROJECT_SOURCES}
     ${STARTUP_SCRIPT})
 
@@ -71,7 +78,7 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     USE_HAL_DRIVER)
 
 target_include_directories(${EXECUTABLE} SYSTEM PRIVATE
-    ${STM32CUBEMX_INCLUDE_DIRECTORIES})
+    ${DRIVER_INCLUDE_DIRECTORIES})
 
 target_include_directories(${EXECUTABLE} PRIVATE
     ${PROJECT_INCLUDE_DIRECTORIES})
