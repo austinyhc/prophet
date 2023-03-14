@@ -74,20 +74,20 @@ extern "C"
 #define BLE_SUB_CMD_FOTA_COMPLETED (BLE_SUB_CMD_BASE + 5)
 #define BLE_SUB_CMD_FOTA_ERROR (BLE_SUB_CMD_BASE + 6)
 
-    void BLE_CM_SPI_Init(void);
-    void BLE_CM_SPI_DeInit(void);
-    void BLE_CM_SPI_Reset(void);
-    void BLE_CM_SPI_Enable_IRQ(void);
-    void BLE_CM_SPI_Disable_IRQ(void);
-    void BLE_CM_OS_Init(void);
+void BLE_CM_SPI_Init(void);
+void BLE_CM_SPI_DeInit(void);
+void BLE_CM_SPI_Reset(void);
+void BLE_CM_SPI_Enable_IRQ(void);
+void BLE_CM_SPI_Disable_IRQ(void);
+void BLE_CM_OS_Init(void);
 
-    /**
-     * @brief  Send and Receive data to/from SPI BUS (Full duplex)
-     * @param  pData: Data
-     * @param  len: Length of data in byte
-     * @retval BSP status
-     */
-    int32_t BLE_CM_SPI_SendRecv(uint8_t* pTxData, uint8_t* pRxData, uint16_t len);
+/**
+ * @brief  Send and Receive data to/from SPI BUS (Full duplex)
+ * @param  pData: Data
+ * @param  len: Length of data in byte
+ * @retval BSP status
+ */
+int32_t BLE_CM_SPI_SendRecv(uint8_t* pTxData, uint8_t* pRxData, uint16_t len);
 
 #ifdef __cplusplus
 }

@@ -28,8 +28,6 @@
 #include "iis2dh_app.h"
 #include "iis2mdc_app.h"
 #include "iis3dwb_app.h"
-#include "imp23absu_app.h"
-#include "imp34dt05_app.h"
 #include "ism330dhcx_app.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -182,22 +180,6 @@ void DMA1_Channel3_IRQHandler(void)
 void DMA1_Channel4_IRQHandler(void)
 {
     HAL_DMA_IRQHandler(&hdma_sm_i2c_tx);
-}
-
-/**
- * @brief This function handles DMA1 channel5 global interrupt.
- */
-void DMA1_Channel5_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&hdma_dfsdm1_flt0);
-}
-
-/**
- * @brief This function handles DMA1 channel6 global interrupt.
- */
-void DMA1_Channel6_IRQHandler(void)
-{
-    HAL_DMA_IRQHandler(&hdma_dfsdm1_flt1);
 }
 
 /**

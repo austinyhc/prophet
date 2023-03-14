@@ -48,60 +48,60 @@ extern "C"
 #define SDM_MLC_CONFIG (uint8_t)(0x01)
 #define SDM_JSON_CONFIG (uint8_t)(0x10)
 
-    extern osMessageQId sdThreadQueue_id;
+extern osMessageQId sdThreadQueue_id;
 
-    extern char* g_prgUcfFileBuffer;
-    extern uint32_t g_prgUcfFileSize;
+extern char* g_prgUcfFileBuffer;
+extern uint32_t g_prgUcfFileSize;
 
-    /**
-     * Create a type name for the callback function. This callback is called when an execution
-     * phase is stopped.
-     */
-    typedef void (*SDMTaskStopEPCallback)(void);
+/**
+ * Create a type name for the callback function. This callback is called when an execution
+ * phase is stopped.
+ */
+typedef void (*SDMTaskStopEPCallback)(void);
 
-    void SDM_OS_Init(void);
-    void SDM_Peripheral_Init(void);
-    void SDM_SD_Init(void);
-    void SDM_SD_DeInit(void);
-    uint8_t SDM_Memory_Init(void);
+void SDM_OS_Init(void);
+void SDM_Peripheral_Init(void);
+void SDM_SD_Init(void);
+void SDM_SD_DeInit(void);
+uint8_t SDM_Memory_Init(void);
 
-    uint8_t SDM_InitFiles(void);
-    uint8_t SDM_CloseFiles(void);
-    uint8_t SDM_UpdateDeviceConfig(void);
-    uint8_t SDM_OpenLogErrorFile(const char* name);
-    uint8_t SDM_OpenDatFile(uint8_t sID, uint8_t ssID, const char* sensorName);
-    uint8_t SDM_CloseFile(uint8_t sID, uint8_t ssID);
-    uint8_t SDM_WriteBuffer(uint8_t sID, uint8_t ssID, uint8_t* buffer, uint32_t size);
-    uint8_t SDM_WriteConfigBuffer(uint8_t* buffer, uint32_t size);
-    uint8_t SDM_Flush_Buffer(uint8_t sID, uint8_t ssID);
-    uint8_t SDM_Fill_Buffer(uint8_t sID, uint8_t ssID, uint8_t* src, uint16_t srcSize);
+uint8_t SDM_InitFiles(void);
+uint8_t SDM_CloseFiles(void);
+uint8_t SDM_UpdateDeviceConfig(void);
+uint8_t SDM_OpenLogErrorFile(const char* name);
+uint8_t SDM_OpenDatFile(uint8_t sID, uint8_t ssID, const char* sensorName);
+uint8_t SDM_CloseFile(uint8_t sID, uint8_t ssID);
+uint8_t SDM_WriteBuffer(uint8_t sID, uint8_t ssID, uint8_t* buffer, uint32_t size);
+uint8_t SDM_WriteConfigBuffer(uint8_t* buffer, uint32_t size);
+uint8_t SDM_Flush_Buffer(uint8_t sID, uint8_t ssID);
+uint8_t SDM_Fill_Buffer(uint8_t sID, uint8_t ssID, uint8_t* src, uint16_t srcSize);
 
-    uint32_t SDM_CreateJSON(char** serialized_string);
-    uint32_t SDM_ReadJSON(char* serialized_string);
-    uint32_t SDM_CreateAcquisitionJSON(char** serialized_string);
+uint32_t SDM_CreateJSON(char** serialized_string);
+uint32_t SDM_ReadJSON(char* serialized_string);
+uint32_t SDM_CreateAcquisitionJSON(char** serialized_string);
 
-    void SDM_WriteUCF(char* ucfData, uint32_t ucfSize);
+void SDM_WriteUCF(char* ucfData, uint32_t ucfSize);
 
-    uint8_t SDM_CheckLowMemory(void);
+uint8_t SDM_CheckLowMemory(void);
 
-    /**
-     * Modifies one of the execution context. It copies the value of the parameters passed in
-     * the execution context variable to the task execution context.
-     *
-     * @param nStopTimerPeriodMS [IN] specifies the duration in ms of the next datalog
-     * execution phase. Zero means infinite period.
-     * @return 0 if success, an error code otherwise.
-     */
-    uint8_t SDM_SetExecutionContext(TickType_t nStopTimerPeriodMS);
+/**
+ * Modifies one of the execution context. It copies the value of the parameters passed in
+ * the execution context variable to the task execution context.
+ *
+ * @param nStopTimerPeriodMS [IN] specifies the duration in ms of the next datalog
+ * execution phase. Zero means infinite period.
+ * @return 0 if success, an error code otherwise.
+ */
+uint8_t SDM_SetExecutionContext(TickType_t nStopTimerPeriodMS);
 
-    /**
-     * Set the stop execution phase callback. The callback is called when an execution phase
-     * ends.
-     *
-     * @param pfCallback [IN] specifies a callback. Pass a NULL pointer to disable the
-     * callback.
-     */
-    void SDM_SetStopEPCallback(SDMTaskStopEPCallback pfCallback);
+/**
+ * Set the stop execution phase callback. The callback is called when an execution phase
+ * ends.
+ *
+ * @param pfCallback [IN] specifies a callback. Pass a NULL pointer to disable the
+ * callback.
+ */
+void SDM_SetStopEPCallback(SDMTaskStopEPCallback pfCallback);
 
 #ifdef __cplusplus
 }

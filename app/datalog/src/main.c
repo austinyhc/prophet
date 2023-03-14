@@ -582,8 +582,7 @@ void SENSOR_Generic_Data_Ready(
         /* Both Digital and Analog microphones are sampled using STM32 clock (DFSDM or ADC) so
          * the measuredODR should be put equal to ODR */
         /* measuredODR has no meaning for MLC subsensor in ISM330DHCX */
-        if (sensorId == IMP34DT05_Get_Id() || sensorId == IMP23ABSU_Get_Id()
-            || (sensorId == ISM330DHCX_Get_Id() && subSensorId == 2))
+        if (sensorId == ISM330DHCX_Get_Id() && subSensorId == 2)
         {
             pSubSensorStatus->measuredODR = pSubSensorStatus->ODR;
         }
@@ -733,8 +732,6 @@ void Peripheral_MSP_Init_All(void)
     IIS2MDC_Peripheral_Init();
     STTS751_Peripheral_Init();
     LPS22HH_Peripheral_Init();
-    IMP34DT05_Peripheral_Init();
-    IMP23ABSU_Peripheral_Init();
     ISM330DHCX_Peripheral_Init();
     IIS2DH_Peripheral_Init();
 }
@@ -746,8 +743,7 @@ void Peripheral_OS_Init_All(void)
     IIS2MDC_OS_Init();
     STTS751_OS_Init();
     LPS22HH_OS_Init();
-    IMP34DT05_OS_Init();
-    IMP23ABSU_OS_Init();
+    IP23ABSU_OS_Init();
     ISM330DHCX_OS_Init();
     IIS2DH_OS_Init();
 }

@@ -27,9 +27,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "sd_diskio.h"
-#include "ff_gen_drv.h"
-
 #include "cmsis_os.h"
+#include "integer.h"
+#include "ff_gen_drv.h"
+#include <diskio.h>
 #include <stdio.h>
 #include <string.h>
 

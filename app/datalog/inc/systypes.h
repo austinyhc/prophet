@@ -27,19 +27,15 @@ extern "C"
 {
 #endif
 
-    /**
-     * Boolean type definition.
-     */
-    typedef enum
-    {
-        FALSE = 0,    //!< FALSE
-        TRUE = !FALSE //!< TRUE
-    } boolean_t;
+/**
+ * Boolean type definition.
+ */
+typedef enum { False = 0, True = !(False) } boolean_t;
 
-    /**
-     * Specifies a generic error type. It could be a system wide error type definition.
-     */
-    typedef uint32_t sys_error_code_t;
+/**
+ * Specifies a generic error type. It could be a system wide error type definition.
+ */
+typedef uint32_t sys_error_code_t;
 
 #ifdef __cplusplus
 }

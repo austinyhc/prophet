@@ -90,7 +90,7 @@ typedef struct _AMCommand
     uint16_t nCmdID;
 
     /**
-     * TRUE when the command must be blocking. It is managed by AMTaskPostCommand() and
+     * True when the command must be blocking. It is managed by AMTaskPostCommand() and
      * AMTaskSendComand() API.
      */
     boolean_t bSyncCmd;
@@ -253,7 +253,7 @@ static void AMStopDatalogEPCallback(void);
  * Check the next step of the execution plan.
  *
  * @param _this [IN] specifies a pointer to the task object.
- * @return TRUE if the execution plan has been completed, FALSE if there is another step to be
+ * @return True if the execution plan has been completed, False if there is another step to be
  * executed.
  */
 static boolean_t AMTaskCheckEndOfPlan(AMTask* _this);
@@ -330,7 +330,7 @@ sys_error_code_t AMTaskInit(AMTask* _this)
                     _this->m_eState = E_AM_STATE_NOT_STARTED;
                     _this->m_nExecutionPlanIdx = 0;
                     _this->m_nPlanIterationCount = 0;
-                    _this->m_bStartupDelayDone = TRUE;
+                    _this->m_bStartupDelayDone = True;
                 }
             }
         }
@@ -344,7 +344,7 @@ sys_error_code_t AMTaskOnNewConfiguration(AMTask* _this)
     assert_param(_this);
     sys_error_code_t xRes = SYS_NO_ERROR_CODE;
 
-    AMCommand xCmd = {.nCmdID = AM_CMD_ID_NEW_CFG, .bSyncCmd = FALSE};
+    AMCommand xCmd = {.nCmdID = AM_CMD_ID_NEW_CFG, .bSyncCmd = False};
 
     if (SYS_IS_CALLED_FROM_ISR())
     {
@@ -374,7 +374,7 @@ sys_error_code_t AMTaskAbortAutoMode(AMTask* _this)
     {
         if (_this->m_eState == E_AM_STATE_STARTED)
         {
-            AMCommand xCmd = {.nCmdID = AM_CMD_ID_ABORT_AM, .bSyncCmd = FALSE};
+            AMCommand xCmd = {.nCmdID = AM_CMD_ID_ABORT_AM, .bSyncCmd = False};
 
             if (SYS_IS_CALLED_FROM_ISR())
             {
@@ -404,21 +404,21 @@ boolean_t AMTaskIsStarted(AMTask* _this)
 {
     assert_param(_this);
 
-    return _this->m_eState == E_AM_STATE_STARTED ? TRUE : FALSE;
+    return _this->m_eState == E_AM_STATE_STARTED ? True : False;
 }
 
 boolean_t AMTaskIsNotStarted(AMTask* _this)
 {
     assert_param(_this);
 
-    return _this->m_eState == E_AM_STATE_NOT_STARTED ? TRUE : FALSE;
+    return _this->m_eState == E_AM_STATE_NOT_STARTED ? True : False;
 }
 
 boolean_t AMTaskIsEnded(AMTask* _this)
 {
     assert_param(_this);
 
-    return _this->m_eState == E_AM_STATE_ENDED ? TRUE : FALSE;
+    return _this->m_eState == E_AM_STATE_ENDED ? True : False;
 }
 
 sys_error_code_t AMTaskStartExecutioPlan(AMTask* _this)
@@ -430,7 +430,7 @@ sys_error_code_t AMTaskStartExecutioPlan(AMTask* _this)
     if (AMGetIstance()->bIsValid)
     {
         AMCommand xCmd = {
-            .bSyncCmd = FALSE,
+            .bSyncCmd = False,
             .nCmdID = AM_CMD_ID_RESTART_PLAN,
         };
         // check if the first time that we load the configuration after reset or if an auto
@@ -488,7 +488,7 @@ static void AMTaskRun(void* pParams)
                         // check if we need to delay the start of the execution plan
                         if (pxAutoModeCfg->nStartDelayMS)
                         {
-                            pxTask->m_bStartupDelayDone = FALSE;
+                            pxTask->m_bStartupDelayDone = False;
                             xTimerChangePeriod(
                                 pxTask->m_xIdleTimer,
                                 pdMS_TO_TICKS(pxAutoModeCfg->nStartDelayMS),
@@ -523,7 +523,7 @@ static void AMTaskRun(void* pParams)
             case AM_CMD_ID_END_OF_EP:
                 if (!pxTask->m_bStartupDelayDone)
                 {
-                    pxTask->m_bStartupDelayDone = TRUE;
+                    pxTask->m_bStartupDelayDone = True;
                     // this is not the first execution phase, but the end of the startup delay.
                     // So, we start the first execution phase
                     xRes = AMTaskStartExecutionPhase(pxTask, pxTask->m_nExecutionPlanIdx);
@@ -565,7 +565,7 @@ static void AMTaskRun(void* pParams)
                     pxTask->m_eState = E_AM_STATE_STARTED;
                     pxTask->m_nExecutionPlanIdx = 0;
                     pxTask->m_nPlanIterationCount = 0;
-                    pxTask->m_bStartupDelayDone = TRUE; // in case of restart Delay is ignored
+                    pxTask->m_bStartupDelayDone = True; // in case of restart Delay is ignored
                     xRes = AMTaskStartExecutionPhase(pxTask, pxTask->m_nExecutionPlanIdx);
                 }
                 break;
@@ -633,7 +633,7 @@ static sys_error_code_t AMTaskStartExecutionPhase(AMTask* _this, uint8_t nIndex)
             AMCommand xCmd = {
                 .nCmdID = AM_CMD_ID_START_EP,
                 .uParam.nParam = (uint32_t)ePhase,
-                .bSyncCmd = FALSE};
+                .bSyncCmd = False};
 
             if (xQueueSendToBack(_this->m_xInQueue, &xCmd, pdMS_TO_TICKS(100)) != pdTRUE)
             {
@@ -704,7 +704,7 @@ static sys_error_code_t AMTaskStartIdle(AMTask* _this)
 static boolean_t AMTaskCheckEndOfPlan(AMTask* _this)
 {
     assert_param(_this);
-    boolean_t bRes = TRUE;
+    boolean_t bRes = True;
     AutoModeCfg* pxAMCfg = AMGetIstance();
 
     // check if we are at the end of the current iteration of the plan.
@@ -721,18 +721,18 @@ static boolean_t AMTaskCheckEndOfPlan(AMTask* _this)
             if (++_this->m_nPlanIterationCount < pxAMCfg->nPhasesIteration)
             {
                 // we need to do another iteration.
-                bRes = FALSE;
+                bRes = False;
             }
         }
         else
         {
             // we need to execute the plan forever.
-            bRes = FALSE;
+            bRes = False;
         }
     }
     else
     {
-        bRes = FALSE;
+        bRes = False;
     }
 
     return bRes;
@@ -741,14 +741,14 @@ static boolean_t AMTaskCheckEndOfPlan(AMTask* _this)
 static void AMTaskIdleTimerCallback(TimerHandle_t xTimer)
 {
     AMTask* pxTask = (AMTask*)pvTimerGetTimerID(xTimer);
-    AMCommand xCmd = {.nCmdID = AM_CMD_ID_END_OF_EP, .bSyncCmd = FALSE};
+    AMCommand xCmd = {.nCmdID = AM_CMD_ID_END_OF_EP, .bSyncCmd = False};
 
     xQueueSendToBack(pxTask->m_xInQueue, &xCmd, pdMS_TO_TICKS(100));
 }
 
 static void AMStopDatalogEPCallback(void)
 {
-    AMCommand xCmd = {.nCmdID = AM_CMD_ID_END_OF_EP, .bSyncCmd = FALSE};
+    AMCommand xCmd = {.nCmdID = AM_CMD_ID_END_OF_EP, .bSyncCmd = False};
 
     if (SYS_IS_CALLED_FROM_ISR())
     {

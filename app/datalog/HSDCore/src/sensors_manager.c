@@ -31,8 +31,6 @@
 #include "iis2dh_app.h"
 #include "iis2mdc_app.h"
 #include "iis3dwb_app.h"
-#include "imp23absu_app.h"
-#include "imp34dt05_app.h"
 #include "ism330dhcx_app.h"
 #include "lps22hh_app.h"
 #include "stts751_app.h"
@@ -904,14 +902,6 @@ uint8_t SM_StartSensorThread(uint8_t sId)
     {
         IIS2MDC_Start();
     }
-    else if (sId == IMP34DT05_Get_Id())
-    {
-        IMP34DT05_Start();
-    }
-    else if (sId == IMP23ABSU_Get_Id())
-    {
-        IMP23ABSU_Start();
-    }
     else if (sId == ISM330DHCX_Get_Id())
     {
         ISM330DHCX_Start();
@@ -949,14 +939,6 @@ uint8_t SM_StopSensorThread(uint8_t sId)
     else if (sId == IIS2MDC_Get_Id())
     {
         IIS2MDC_Stop();
-    }
-    else if (sId == IMP34DT05_Get_Id())
-    {
-        IMP34DT05_Stop();
-    }
-    else if (sId == IMP23ABSU_Get_Id())
-    {
-        IMP23ABSU_Stop();
     }
     else if (sId == ISM330DHCX_Get_Id())
     {

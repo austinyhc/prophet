@@ -27,8 +27,6 @@
 #include "iis2dh_app.h"
 #include "iis2mdc_app.h"
 #include "iis3dwb_app.h"
-#include "imp23absu_app.h"
-#include "imp34dt05_app.h"
 #include "ism330dhcx_app.h"
 #include "lps22hh_app.h"
 #include "stts751_app.h"
