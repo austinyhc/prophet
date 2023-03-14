@@ -8,6 +8,7 @@ include(./gcc-arm-none-eabi.cmake)
 if ("${PROJECT_NAME}" STREQUAL "")
     set(PROJECT_NAME prophet)
 endif()
+
 project(${PROJECT_NAME})
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -28,8 +29,8 @@ set(CPU_PARAMETERS
     -mfpu=fpv4-sp-d16
     -mfloat-abi=hard)
 
-set(STARTUP_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/startup_stm32l4r9xx.c)
-set(MCU_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/stm32l4r9xx.ld)
+set(STARTUP_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/startup_stm32l4r9xx.s)
+set(MCU_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/stm32l4r9zitx_flash.ld)
 
 ###############################################################################
 set(EXECUTABLE ${CMAKE_PROJECT_NAME})
@@ -45,24 +46,47 @@ set(CMAKE_CXX_EXTENSIONS ON)
 ###############################################################################
 
 set(DRIVER_INCLUDE_DIRECTORIES
-    ${CMAKE_CURRENT_SOURCE_DIR}/app/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/HSDCore/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc/Legacy
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/board/${BOARD_MODEL}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/board/${BOARD_MODEL}
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/stts751
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/hts221
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/ism330dhcx
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/lps22hh
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/iis2mdc
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/ism330dhcx
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/lps22hb
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/iis2dh
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/iis3dwb
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis)
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/STM32_USB_Device_Library/Class/SensorStreaming_WCID/Inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/STM32_USB_Device_Library/Core/Inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/includes
+	${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/utils
+	${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/hci/hci_tl_patterns/Basic
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src/drivers
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/GCC/ARM_CM4F
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/CMSIS_RTOS
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/parson)
 
 set(PROJECT_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB_RECURSE DRIVER_SOURCES CONFIGURE_DEPENDS
     # ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/*.c)
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/CMSIS_RTOS/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/parson/*.c)
 
-set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app)
+set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME})
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     ${PROJECT_DIR}/*.cpp
     ${PROJECT_DIR}/*.c)
@@ -75,7 +99,15 @@ add_executable(${EXECUTABLE}
 target_compile_definitions(${EXECUTABLE} PRIVATE
     #$<$<CONFIG:Debug>:DEBUG>
     ${MCU_MODEL}
-    USE_HAL_DRIVER)
+    USE_HAL_DRIVER
+    ARM_MATH_CM4
+    USE_HAL_DFSDM_REGISTER_CALLBACKS
+    USE_HAL_ADC_REGISTER_CALLBACKS
+    USE_HAL_SAI_REGISTER_CALLBACKS
+    USE_HAL_SPI_REGISTER_CALLBACKS
+    USE_HAL_I2C_REGISTER_CALLBACKS
+    USE_HAL_TIM_REGISTER_CALLBACKS
+    ONBOARD_DIGITAL_MIC)
 
 target_include_directories(${EXECUTABLE} SYSTEM PRIVATE
     ${DRIVER_INCLUDE_DIRECTORIES})
