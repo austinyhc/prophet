@@ -43,6 +43,9 @@ Even the company has been transferred to a successor, still, I want to use some 
 <listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/Audio/C/lib/inc"/>
 <listOptionValue builtIn="false" value="../../../../../../../Middlewares/Third_Party/parson"/>
 <listOptionValue builtIn="false" value="../../../../../../../Drivers/CMSIS/Include"/>
+<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/BlueNRG-2/includes"/>
+<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/BlueNRG-2/utils"/>
+<listOptionValue builtIn="false" value="../../../../../../../Middlewares/ST/BlueNRG-2/hci/hci_tl_patterns/Basic"/>
 ```
 
 - [ ] Define symbols (-D)
