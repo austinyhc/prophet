@@ -38,7 +38,7 @@ int32_t BSP_MOTION_SENSOR_Enable_HP_Filter(uint32_t Instance, uint8_t CutOff)
   {
 #if (USE_MOTION_SENSOR_IIS3DWB_0 == 1)
     case IIS3DWB_0:
-      if (IIS3DWB_Filter_Set(MotionCompObj[Instance], (iis3dwb_hp_slope_xl_en_t)CutOff) != BSP_ERROR_NONE)
+      if (IIS3DWB_Filter_Set(MotionCompObj[Instance], (iis3dwb_filt_xl_en_t)CutOff) != BSP_ERROR_NONE)
       {
         ret = BSP_ERROR_COMPONENT_FAILURE;
       }
