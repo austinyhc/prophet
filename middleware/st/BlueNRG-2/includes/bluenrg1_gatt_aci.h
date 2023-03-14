@@ -30,11 +30,11 @@
 /** @defgroup ST
  *  @{
  */
- 
+
 /** @defgroup SimpleBlueNRG_HCI
  *  @{
  */
- 
+
 /**
  *@addtogroup GATT GATT
  *@brief GATT layer.
@@ -1183,7 +1183,7 @@ tBleStatus aci_gatt_set_access_permission(uint16_t Serv_Handle,
 /**
  * @}
  */
- 
+
 /**
  * @}
  */
