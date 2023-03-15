@@ -2,7 +2,7 @@
 ############################### Native Makefile ###############################
 
 SHELL := /bin/bash
-PROJECT_NAME ?= prophet
+PROJECT_NAME ?= datalog
 BUILD_DIR ?= build
 FIRMWARE := $(BUILD_DIR)/$(PROJECT_NAME).bin
 BUILD_TYPE ?= Debug
