@@ -589,7 +589,7 @@ void SENSOR_Generic_Data_Ready(
         else
         {
             pSubSensorStatus->measuredODR = pSubSensorContext->n_samples_acc
-                                          / (timeStamp - pSubSensorContext->old_time_stamp);
+                / (float)(timeStamp - pSubSensorContext->old_time_stamp);
         }
         pSubSensorContext->old_time_stamp = timeStamp;
         samplesToSend = size / nBytesPerSample;
@@ -694,11 +694,6 @@ void IIS2MDC_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double
     SENSOR_Generic_Data_Ready(IIS2MDC_Get_Id(), subSensorId, buf, size, timeStamp);
 }
 
-void IMP34DT05_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double timeStamp)
-{
-    SENSOR_Generic_Data_Ready(IMP34DT05_Get_Id(), subSensorId, buf, size, timeStamp);
-}
-
 void ISM330DHCX_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double timeStamp)
 {
     SENSOR_Generic_Data_Ready(ISM330DHCX_Get_Id(), subSensorId, buf, size, timeStamp);
@@ -713,11 +708,6 @@ void ISM330DHCX_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, dou
 void LPS22HH_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double timeStamp)
 {
     SENSOR_Generic_Data_Ready(LPS22HH_Get_Id(), subSensorId, buf, size, timeStamp);
-}
-
-void IMP23ABSU_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double timeStamp)
-{
-    SENSOR_Generic_Data_Ready(IMP23ABSU_Get_Id(), subSensorId, buf, size, timeStamp);
 }
 
 void STTS751_Data_Ready(uint8_t subSensorId, uint8_t* buf, uint16_t size, double timeStamp)
