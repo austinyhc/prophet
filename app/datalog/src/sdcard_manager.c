@@ -183,10 +183,8 @@ void Enable_Sensors(void)
     Activate_Sensor(IIS3DWB_Get_Id());
     Activate_Sensor(IIS2DH_Get_Id());
     Activate_Sensor(IIS2MDC_Get_Id());
-    Activate_Sensor(IMP34DT05_Get_Id());
     Activate_Sensor(ISM330DHCX_Get_Id());
     Activate_Sensor(LPS22HH_Get_Id());
-    Activate_Sensor(IMP23ABSU_Get_Id());
     Activate_Sensor(STTS751_Get_Id());
 }
 

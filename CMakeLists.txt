@@ -47,6 +47,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(DRIVER_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/conf
     ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/HSDCore/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/hal/${MCU_FAMILY}/inc/Legacy
@@ -68,7 +69,6 @@ set(DRIVER_INCLUDE_DIRECTORIES
 	${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/utils
 	${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/hci/hci_tl_patterns/Basic
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src/drivers
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/GCC/ARM_CM4F
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/CMSIS_RTOS
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/include
@@ -77,14 +77,20 @@ set(DRIVER_INCLUDE_DIRECTORIES
 set(PROJECT_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB_RECURSE DRIVER_SOURCES CONFIGURE_DEPENDS
-    # ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/*.c
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/CMSIS_RTOS/*.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME}/conf/*.h
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/parson/*.c)
+
+file(GLOB FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/*.c)
+list(APPEND FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/MemMang/heap_4.c)
+list(APPEND FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c)
+list(APPEND FREERTOS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c)
+
+file(GLOB FATFS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src/*.c)
+list(APPEND FATFS_SOURCES
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src/option/syscall.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/middleware/third_party/FatFs/src/option/unicode.c)
 
 set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/app/${PROJECT_NAME})
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
@@ -93,11 +99,13 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
 
 add_executable(${EXECUTABLE}
     ${DRIVER_SOURCES}
+    ${FREERTOS_SOURCES}
+    ${FATFS_SOURCES}
     ${PROJECT_SOURCES}
     ${STARTUP_SCRIPT})
 
 target_compile_definitions(${EXECUTABLE} PRIVATE
-    #$<$<CONFIG:Debug>:DEBUG>
+    $<$<CONFIG:Debug>:DEBUG>
     ${MCU_MODEL}
     USE_HAL_DRIVER
     ARM_MATH_CM4

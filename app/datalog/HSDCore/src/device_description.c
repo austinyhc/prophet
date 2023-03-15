@@ -467,13 +467,9 @@ uint8_t update_sensors_config(void)
     IIS2MDC_Init_Param.FS[0] = pSensor->sensorStatus.subSensorStatus[0].FS;
     IIS2MDC_Init_Param.subSensorActive[0] = pSensor->sensorStatus.subSensorStatus[0].isActive;
 
-    IMP34DT05_updateConfig();
-
     ret += ISM330DHCX_updateConfig();
 
     ret += LPS22HH_updateConfig();
-
-    IMP23ABSU_updateConfig();
 
     pSensor = COM_GetSensor(STTS751_Get_Id());
     STTS751_Init_Param.ODR[0] = pSensor->sensorStatus.subSensorStatus[0].ODR;

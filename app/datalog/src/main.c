@@ -738,12 +738,10 @@ void Peripheral_MSP_Init_All(void)
 
 void Peripheral_OS_Init_All(void)
 {
-    HTS221_OS_Init();
     IIS3DWB_OS_Init();
+    HTS221_OS_Init();
     IIS2MDC_OS_Init();
     STTS751_OS_Init();
-    LPS22HH_OS_Init();
-    IP23ABSU_OS_Init();
     ISM330DHCX_OS_Init();
     IIS2DH_OS_Init();
 }
