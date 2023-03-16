@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 #include <iostream>
-#include "hs_datalog.h"
+#include "hsd.h"
 #include <stdio.h>
 #include "pthread.h"
 #include <unistd.h>
