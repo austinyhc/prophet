@@ -15,6 +15,7 @@
   *
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -860,4 +861,5 @@ ErrorStatus LL_RTC_WaitForSynchro(RTC_TypeDef *RTCx)
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */

@@ -15,6 +15,7 @@
   *
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -284,5 +285,6 @@ void LL_EXTI_StructInit(LL_EXTI_InitTypeDef *EXTI_InitStruct)
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */
 

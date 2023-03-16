@@ -14,6 +14,7 @@
   * If no LICENSE file comes with this software, it is provided AS-IS.
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -2035,5 +2036,6 @@ static uint32_t RCC_PLLSAI2_GetFreqDomain_ADC(void)
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */
 

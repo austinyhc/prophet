@@ -15,6 +15,7 @@
   *
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -289,5 +290,6 @@ void LL_GPIO_StructInit(LL_GPIO_InitTypeDef *GPIO_InitStruct)
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */
 

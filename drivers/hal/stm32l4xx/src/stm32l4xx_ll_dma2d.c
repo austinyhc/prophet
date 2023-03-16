@@ -15,6 +15,7 @@
   *
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -650,4 +651,5 @@ void LL_DMA2D_ConfigSize(DMA2D_TypeDef *DMA2Dx, uint32_t NbrOfLines, uint32_t Nb
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */

@@ -15,6 +15,7 @@
   *
   ******************************************************************************
   */
+#pragma GCC diagnostic ignored "-Wpedantic"
 #if defined(USE_FULL_LL_DRIVER)
 
 /* Includes ------------------------------------------------------------------*/
@@ -176,4 +177,5 @@ void LL_SWPMI_StructInit(LL_SWPMI_InitTypeDef *SWPMI_InitStruct)
   * @}
   */
 
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif /* USE_FULL_LL_DRIVER */
