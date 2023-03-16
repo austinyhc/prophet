@@ -1,4 +1,4 @@
-.PHONY: all build cmake run clean
+.PHONY: all build cmake run cleat
 ############################### Native Makefile ###############################
 
 SHELL := /bin/bash
@@ -32,7 +32,7 @@ $(BUILD_DIR)/Makefile: CMakeLists.txt
 		-DPROJECT_NAME=$(PROJECT_NAME)
 
 run: build dev_config.json
-	$(EXECUTABLE) -f ./dev_config.json -t 100
+	$(EXECUTABLE) -f ./DeviceConfig.json -t 100
 
 clean:
 	rm -rf $(BUILD_DIR)
