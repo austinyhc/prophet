@@ -14,11 +14,11 @@ int main()
     while (1)
     {
         GPIOE->BSRR = (1 << 17);
-        for (c = 0; c < 100000; c++)
+        for (c = 0; c < 10000; c++)
             ;
 
         GPIOE->BSRR = (1 << 1);
-        for (c = 0; c < 100000; c++)
+        for (c = 0; c < 10000; c++)
             ;
     }
 }
