@@ -1,4 +1,4 @@
-.PHONY: all build build-container cmake format format-linux flash-stlink format-container shell image build-container clean clean-image clean-all
+.PHONY: all build build-container cmake format format-linux flash-stlink format-container shell image build-container clean clean-image clean-all flash-baseline
 ############################### Native Makefile ###############################
 
 SHELL := /bin/bash
@@ -52,6 +52,9 @@ format-linux: $(addsuffix .format-linux,$(FORMAT_LINUX))
 
 flash-stlink: build
 	st-flash --reset write $(FIRMWARE) 0x08000000
+
+flash-baseline: build
+	st-flash --reset write baseline/HSDatalog.bin 0x08000000
 
 clean:
 	rm -rf $(BUILD_DIR)

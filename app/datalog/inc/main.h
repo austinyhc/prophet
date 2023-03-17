@@ -45,8 +45,8 @@ extern "C"
     /* Exported types ------------------------------------------------------------*/
     /* Exported constants --------------------------------------------------------*/
 
-#define HSD_BLE_ENABLE 1
-#define HSD_BLE_STATUS_TIMER_ENABLE 1
+#define HSD_BLE_ENABLE 0
+#define HSD_BLE_STATUS_TIMER_ENABLE 0
 
 /*
  * SD task priority shoul be lower than data aquisition tasks
