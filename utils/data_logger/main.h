@@ -60,11 +60,11 @@ public:
 
         citer = std::find(this->tokens.begin(), this->tokens.end(), option);
 
-        if (citer != this->tokens.end() && ++citer != this->tokens.end()) {
-            return *citer;
-        }
-        static const string empty_string("");
-        return empty_string;
+        static const string empty("");
+        if (citer == this->tokens.end()) return empty;
+        if (++citer == this->tokens.end()) return empty;
+
+        return *citer;
     }
 
     bool cmdOptionExists(const string &option) const {
