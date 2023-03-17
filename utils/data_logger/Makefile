@@ -1,4 +1,4 @@
-.PHONY: all build cmake run cleat
+.PHONY: all build cmake run cleat gdb
 ############################### Native Makefile ###############################
 
 SHELL := /bin/bash
@@ -31,8 +31,11 @@ $(BUILD_DIR)/Makefile: CMakeLists.txt
 		-B$(BUILD_DIR) \
 		-DPROJECT_NAME=$(PROJECT_NAME)
 
-run: build dev_config.json
+run: build DeviceConfig.json
 	$(EXECUTABLE) -f ./DeviceConfig.json -t 100
+
+gdb: build $(EXECUTABLE)
+	gdb -q --args $(EXECUTABLE) -f ./DeviceConfig.json -t 100
 
 clean:
 	rm -rf $(BUILD_DIR)
