@@ -19,79 +19,73 @@
 
 #include <stdint.h>
 #include <iostream>
-#include "hsd.h"
 #include <stdio.h>
-#include "pthread.h"
 #include <unistd.h>
-#include "json.hpp"
 #include <vector>
 #include <iomanip>
 #include <fstream>
 #include <ctime>
 #include <string>
 #include <chrono>
-#if _WIN32
-#include <conio.h>
-#endif
+#include "hsd.h"
+#include "pthread.h"
+#include "json.hpp"
 
-#ifdef __linux__
+#ifdef _WIN32
+#include <conio.h>
+#include "windows.h"
+#elif __linux__
 #include <sys/stat.h>
 int _kbhit() ;
-#elif _WIN32
-#include "windows.h"
 #endif
 
-class InputParser
-{
-public:
-  InputParser(int &argc, char **argv)
-  {
-    for (int i = 1; i < argc; ++i)
-    {
-      this->tokens.push_back(std::string(argv[i]));
-    }
-  }
+using std::vector;
+using std::string;
 
-  const std::string &getCmdOption(const std::string &option) const
-  {
-    std::vector<std::string>::const_iterator itr;
-    itr =  std::find(this->tokens.begin(), this->tokens.end(), option);
-    if (itr != this->tokens.end() && ++itr != this->tokens.end())
-    {
-      return *itr;
-    }
-    static const std::string empty_string("");
-    return empty_string;
-  }
-
-  bool cmdOptionExists(const std::string &option) const
-  {
-    return std::find(this->tokens.begin(), this->tokens.end(), option)
-           != this->tokens.end();
-  }
+class InputParser {
 
 private:
-  std::vector <std::string> tokens;
+    vector <std::string> tokens;
+
+public:
+    InputParser(int &argc, char **argv) {
+        for (int i = 1; i < argc; ++i) {
+            this->tokens.push_back(string(argv[i]));
+        }
+    }
+
+    const string &getCmdOption(const string &option) const {
+
+        vector<string>::const_iterator citer;
+
+        citer = std::find(this->tokens.begin(), this->tokens.end(), option);
+
+        if (citer != this->tokens.end() && ++citer != this->tokens.end()) {
+            return *citer;
+        }
+        static const string empty_string("");
+        return empty_string;
+    }
+
+    bool cmdOptionExists(const string &option) const {
+        return std::find(this->tokens.begin(), this->tokens.end(), option) != this->tokens.end();
+    }
 };
 
-
-// Get Input
-bool getInput(char *c)
-{
+bool getInput(char *c) {
 #ifdef __linux__
-  if (_kbhit())
-  {
-    *c = getc(stdin);
-    return true; // Key Was Hit
-  }
-  return false; // No keys were pressed
+    if (_kbhit())
+    {
+        *c = getc(stdin);
+        return true; // Key Was Hit
+    }
+    return false; // No keys were pressed
 #elif _WIN32
-  if (_kbhit())
-  {
-    *c = getch();
-    return true; // Key Was Hit
-  }
-  return false; // No keys were pressed
+    if (_kbhit())
+    {
+        *c = getch();
+        return true; // Key Was Hit
+    }
+    return false; // No keys were pressed
 #endif
 }
-
