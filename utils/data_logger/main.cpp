@@ -23,6 +23,8 @@
 #include <iomanip>
 #include <sstream>
 #include <optional>
+#include <memory>
+#include "hsd.h"
 #include "json.hpp"
 #include "cxxopts.hpp"
 
@@ -32,8 +34,9 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-void action_load_and_store_device_config() {
+#define DEVICE_ID 0
 
+void hs_datalog_initialize() {
     if(hs_datalog_open() != ST_HS_DATALOG_OK) {
         cout << "Error occurred while initializing datalog\n";
         cout << "Press any key to exit \n";
@@ -55,78 +58,49 @@ void action_load_and_store_device_config() {
         cin.get();
         exit(EXIT_FAILURE);
     }
+}
 
-    char *data;
-    if(hs_datalog_get_device(0, &data) != ST_HS_DATALOG_OK) {
+void action_load_and_save_device_config() {
+
+    char* config;
+    int ret = hs_datalog_get_device(DEVICE_ID, &config);
+
+    if (ret == ST_HS_DATALOG_ERROR) {
         cout << "Error occurred while retrieving device configuration\n";
         cout << "Press any key to exit \n";
         cin.get();
         exit(EXIT_FAILURE);
     }
-    auto json = nlohmann::json::parse(data);
+
+    auto json = nlohmann::json::parse(config);
 
     std::ofstream writer;
-    writer.open("DeviceConfig.json", std::ios::out | std::ios::binary);
+    writer.open("./DeviceConfig.json", std::ios::out | std::ios::binary);
     writer << json.dump(1);
     writer.close();
 
     cout << "Current Device Configuration has been saved.\n";
-    hs_datalog_free(data);
-    exit(EXIT_SUCCESS);
+
+    hs_datalog_free(config);
 }
 
-void action_load_device_descriptor() {
-    if(hs_datalog_open() != ST_HS_DATALOG_OK)
-    {
-        cout << "Error occurred while initializing datalog\n";
-        cout << "Press any key to exit \n";
-        cin.get();
-        exit(EXIT_FAILURE);
-    }
+void action_print_device_descriptor() {
 
-    int n_devices = 0;
-    if(hs_datalog_get_device_number(&n_devices) != ST_HS_DATALOG_OK)
-    {
-        cout << "Error occurred while retrieving device number\n";
-        cout << "Press any key to exit \n";
-        exit(EXIT_FAILURE);
-        getchar();
-    }
+    char* desc;
+    int ret = hs_datalog_get_device_descriptor(DEVICE_ID, &desc);
 
-    if(n_devices == 0)
-    {
-        cout << "No devices, exiting\n";
-        cout << "Press any key to exit \n";
-        cin.get();
-        exit(EXIT_FAILURE);
-    }
-
-    /* If multiple devices are present, address only device with id = 0 */
-    int device_id = 0;
-    int n_sensors = 0;
-
-    char * tempDev;
-
-    if(hs_datalog_get_device_descriptor(device_id, &tempDev) != ST_HS_DATALOG_OK)
-    {
+    if (ret == ST_HS_DATALOG_ERROR) {
         cout << "Error occurred while retrieving device descriptor\n";
         cout << "Press any key to exit \n";
         cin.get();
         exit(EXIT_FAILURE);
     }
 
-    auto json = nlohmann::json::parse(tempDev);
+    auto json = nlohmann::json::parse(desc);
     cout << "Device information: \n";
     cout << json.dump(1) << "\n";
 
-    /* Free memory */
-    if(hs_datalog_free(tempDev) != ST_HS_DATALOG_OK)
-    {
-        cout << "Error occurred while freeing memory\n";
-        cout << "Press any key to exit \n";
-        cin.get();
-        exit(EXIT_FAILURE);
-    }
+    hs_datalog_free(desc);
 }
 
 void action_print_usage(const string& content) {
@@ -143,26 +117,136 @@ void action_print_version() {
     exit(EXIT_SUCCESS);
 }
 
+std::map<std::tuple<int, string>, bool>
+action_get_available_tag() {
+
+    char* tag_info;
+    hs_datalog_get_available_tags(DEVICE_ID, &tag_info);
+
+    auto json  = nlohmann::json::parse(std::string(tag_info));
+    auto tags = json.at("swTags");
+
+    std::map<std::tuple<int, string>, bool> dict;
+    for (auto const& tag : tags) {
+        auto key = std::make_tuple(tag.at("id"), tag.at("label"));
+        dict.insert({key, false});
+    }
+
+    hs_datalog_free(tag_info);
+
+    return dict;
+}
+
+char* read_file(std::ifstream& infile) {
+
+    infile.seekg(0, std::ios::end);
+    size_t len = infile.tellg();
+
+    char* stream = new char[len+1];
+
+    infile.seekg (0, std::ios::beg);
+    infile.read(stream, static_cast<int>(len));
+    infile.close();
+
+    stream[len] = '\0';
+    return stream;
+}
+
+void action_send_message(std::ifstream& infile) {
+
+    char acq_name[] = "testName";
+    char acq_description[] = "descriptionTest";
+    hs_datalog_set_acquisition_param(DEVICE_ID, acq_name, acq_description);
+
+    vector<vector<bool>> SubsensorIsActive;
+
+    char* data = read_file(infile);
+    auto json = nlohmann::json::parse(data);
+
+    auto sensors = json.at("device").at("sensor");
+
+    for (auto const& sensor : sensors) {
+
+        auto sub_sensor_stat = sensor.at("sensorStatus").at("subSensorStatus");
+        auto sub_sensor_desc = sensor.at("sensorDescriptor").at("subSensorDescriptor");
+
+        nlohmann::json cmd;
+        cmd["command"] = "SET";
+        cmd["sensorId"] = sensor.at("id");
+
+        auto stat_iter = sub_sensor_stat.begin();
+        auto desc_iter = sub_sensor_desc.begin();
+
+        for (; stat_iter != sub_sensor_stat.end() &&
+               desc_iter != sub_sensor_desc.end();
+                ++stat_iter, ++desc_iter) {
+
+            int sub_sensor_id = desc_iter->at("id");
+            nlohmann::json params;
+            params["id"] = sub_sensor_id;
+
+            // TODO: Change to range-based loop
+            auto it = stat_iter->begin();
+            auto end = stat_iter->end();
+            for(; it!=end; it++) {
+                params[it.key()] = it.value();
+            }
+            cmd["subSensorStatus"].push_back(params);
+        }
+
+        int ret = hs_datalog_send_message(
+                DEVICE_ID, const_cast<char *>(cmd.dump().data()),
+                static_cast<int>(cmd.dump().length()), nullptr, nullptr);
+
+        if (ret == ST_HS_DATALOG_ERROR) {
+            cout << "Error occurred while sending message\n";
+            cout << "Press any key to exit \n";
+            cin.get();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    /* Update tag list */
+    auto tag_hw = json.at("device").at("tagConfig").at("hwTags");
+    auto tag_sw = json.at("device").at("tagConfig").at("swTags");
+
+    for (auto const& el : tag_hw) {
+        int id = el.at("id");
+        string label = el.at("label");
+        hs_datalog_set_hw_label(DEVICE_ID, id, &label[0]);
+
+        bool status = el.at("enabled");
+        hs_datalog_enable_hw_tag(DEVICE_ID, id, status);
+    }
+
+    for (auto const& el : tag_sw) {
+        int id = el.at("id");
+        string label = el.at("label");
+        hs_datalog_set_sw_label(DEVICE_ID, id, &label[0]);
+    }
+
+    delete[] data;
+}
+
+
 int main(int argc, char *argv[])
 {
+    hs_datalog_initialize();
+
     cxxopts::Options options("data_logger", "Data Logger CLI");
 
     options.add_options()
         ("v,version", "Print version information and then exit.")
         ("h,help", "Print usage and then exit.")
-        ("f,config", "Device configuration file (JSON).",
-            cxxopts::value<string>())
-        ("t,duration", "Duration of the acquisition (seconds).",
-            cxxopts::value<uint32_t>()->default_value("60"))
-        ("y", "Directly start the acquistion without waiting for user confirmation.")
-        ("g", "Get current device configuration and save it.")
+        ("f,config", "Device configuration file (JSON).", cxxopts::value<string>())
+        ("t,duration", "Duration of the acquisition (seconds).", cxxopts::value<uint32_t>()->default_value("60"))
+        ("g,load-config", "Get current device configuration and save it.")
     ;
 
     auto result = options.parse(argc, argv);
-
     if (result.count("v")) action_print_version();
     if (result.count("h")) action_print_usage(options.help());
-    if (result.count("g")) action_load_and_store_device_config();
+    if (result.count("g")) action_load_and_save_device_config();
 
 
     // NOTE: `-f` for the reader of the device_config and `-t` for the duration
@@ -174,108 +258,17 @@ int main(int argc, char *argv[])
         reader.open(filename, std::ios::in | std::ios::binary);
         if (!reader.is_open()) {
             cout << "File not found: " << filename << endl;
-            exit(1);
+            return EXIT_FAILURE;
         }
     }
+
     uint32_t timeout_seconds = result["t"].as<uint32_t>();
 
-    // NOTE: Do we need to read device descriptor before reading number of sensor
-    // NOTE: `deviceID` is set to 0 if multiple devices found
-    // if(hs_datalog_get_sensor_number(deviceID, &nSensors) != ST_HS_DATALOG_OK)
-    // {
-    //     cout << "Error occurred while retrieving sensor number\n";
-    //     cout << "Press any key to exit \n";
-    //     getchar();
-    //     return -1;
-    // }
+    action_print_device_descriptor();
 
-    // char acq_name[] = "testName";
-    // char acq_description[] = "descriptionTest";
-    // hs_datalog_set_acquisition_param(deviceID, acq_name, acq_description);
+    auto dict = action_get_available_tag();
 
-
-    vector<vector<bool>> SubsensorIsActive;
-
-    /* Try and open JSON config file on the hard disk*/
-    bool configFromFile = false;
-    if (configFile.is_open())
-    {
-        configFromFile = true;
-        cout << endl <<"Configuration imported from Json file " << endl << endl;
-
-        configFile.seekg (0, configFile.end);
-        long long size = configFile.tellg();
-        configFile.seekg (0, configFile.beg);
-
-        /* Read the whole file */
-        char * jsonChar = new char [size+1];
-        configFile.seekg (0, ios::beg);
-        configFile.read (jsonChar, static_cast<int>(size));
-        configFile.close();
-        jsonChar[size]=0;  // JSON lib needs a '\0' at the end of the string
-
-        /* Parse JSON and extract sensors */
-        auto configJson = nlohmann::json::parse(jsonChar);
-        auto jSensors = configJson.at("device").at("sensor");
-
-        /* Create messages to set sensor status as described in the file and send them to the device*/
-        for (size_t j = 0; j < jSensors.size(); j++ )
-        {
-            auto jSubSensorsStatus = jSensors.at(j).at("sensorStatus").at("subSensorStatus");
-            nlohmann::json cmd;
-            cmd["command"] = "SET";
-            cmd["sensorId"] = jSensors.at(j).at("id");
-
-            SubsensorIsActive.push_back(std::vector<bool>());
-            for(size_t k = 0; k< jSubSensorsStatus.size(); k++ )
-            {
-                nlohmann::json params;
-                auto subId = jSensors.at(j).at("sensorDescriptor").at("subSensorDescriptor").at(k).at("id");
-                params["id"]= subId;
-
-                auto it = jSubSensorsStatus.at(k).begin();
-                auto end = jSubSensorsStatus.at(k).end();
-                for(; it!=end; it++)
-                {
-                    params[it.key()]=it.value();
-                }
-                cmd["subSensorStatus"].push_back(params);
-                SubsensorIsActive[j].push_back(jSensors.at(j).at("sensorStatus").at("subSensorStatus").at(k).at("isActive"));
-            }
-            if(hs_datalog_send_message(deviceID, const_cast <char *>(cmd.dump().data()), static_cast<int>(cmd.dump().length()), nullptr, nullptr) != ST_HS_DATALOG_OK)
-            {
-                cout << "Error occurred while sending message\n";
-                cout << "Press any key to exit \n";
-                getchar();
-                return -1;
-            }
-        }
-        /* Update tag list */
-        auto tag_hw = configJson.at("device").at("tagConfig").at("hwTags");
-        auto tag_sw = configJson.at("device").at("tagConfig").at("swTags");
-
-        auto it= tag_hw.begin();
-        while(it !=tag_hw.end() )
-        {
-            int id=it->at("id");
-            string label=it->at("label");
-            hs_datalog_set_hw_label(deviceID, id, &label[0]);
-
-            bool status =it->at("enabled");
-            hs_datalog_enable_hw_tag(deviceID, id, status);
-            it++;
-        }
-
-        it= tag_sw.begin();
-        while(it !=tag_sw.end() )
-        {
-            int id=it->at("id");
-            string label=it->at("label");
-            hs_datalog_set_sw_label(deviceID, id, &label[0]);
-            it++;
-        }
-        delete[] jsonChar;
-    }
+    if (reader.is_open()) action_send_message(reader);
 
     return 0;
 }
