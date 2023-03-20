@@ -39,37 +39,16 @@
 int _kbhit() ;
 #endif
 
-using std::vector;
-using std::string;
+#define DLOGGER__VERSION_MAJOR 0
+#define DLOGGER__VERSION_MINOR 0
+#define DLOGGER__VERSION_PATCH 1
 
-class InputParser {
-
-private:
-    vector <std::string> tokens;
-
-public:
-    InputParser(int &argc, char **argv) {
-        for (int i = 1; i < argc; ++i) {
-            this->tokens.push_back(string(argv[i]));
-        }
-    }
-
-    const string &getCmdOption(const string &option) const {
-
-        vector<string>::const_iterator citer;
-
-        citer = std::find(this->tokens.begin(), this->tokens.end(), option);
-
-        if (citer != this->tokens.end() && ++citer != this->tokens.end()) {
-            return *citer;
-        }
-        static const string empty_string("");
-        return empty_string;
-    }
-
-    bool cmdOptionExists(const string &option) const {
-        return std::find(this->tokens.begin(), this->tokens.end(), option) != this->tokens.end();
-    }
+static constexpr struct {
+    uint8_t major, minor, patch;
+} version = {
+    DLOGGER__VERSION_MAJOR,
+    DLOGGER__VERSION_MINOR,
+    DLOGGER__VERSION_PATCH
 };
 
 bool getInput(char *c) {
