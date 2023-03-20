@@ -53,7 +53,7 @@ format-linux: $(addsuffix .format-linux,$(FORMAT_LINUX))
 flash-stlink: build
 	st-flash --reset write $(FIRMWARE) 0x08000000
 
-flash-baseline: build
+flash-baseline: baseline
 	st-flash --reset write baseline/HSDatalog.bin 0x08000000
 
 clean:
