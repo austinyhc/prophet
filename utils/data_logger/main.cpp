@@ -36,6 +36,9 @@ using std::endl;
 
 #define DEVICE_ID 0
 
+static uint8_t FEATURE_TAGGING = 1;
+
+
 void hs_datalog_initialize() {
     if(hs_datalog_open() != ST_HS_DATALOG_OK) {
         cout << "Error occurred while initializing datalog\n";
@@ -225,6 +228,26 @@ void action_send_message(std::ifstream& infile) {
     delete[] data;
 }
 
+
+std::map<std::tuple<int,string>, bool>
+action_read_tags() {
+    std::map<std::tuple<int,string>, bool> tags;
+
+    char* data;
+    hs_datalog_get_available_tags(0, &data);
+
+    auto json = nlohmann::json::parse(std::string(data));
+    auto sw_tags = json.at("swTags");
+
+    for (auto const& sw_tag : sw_tags) {
+        auto tup = std::make_tuple(sw_tag.at("id"), sw_tag.at("label"));
+        tags.insert(std::pair<std::tuple<int, string>, bool>(tup, false));
+    }
+    delete[] data;
+
+    return tags;
+}
+
 int main(int argc, char *argv[])
 {
     hs_datalog_initialize();
@@ -265,6 +288,9 @@ int main(int argc, char *argv[])
     auto dict = action_get_available_tag();
 
     if (reader.is_open()) action_send_message(reader);
+
+    std::map<std::tuple<int,string>, bool> tags;
+    if (FEATURE_TAGGING) tags = action_read_tags();
 
     return 0;
 }
