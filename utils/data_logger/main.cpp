@@ -248,6 +248,19 @@ action_read_tags() {
     return tags;
 }
 
+void create_filename_from_current_time(char* filename, size_t len) {
+
+    filename[0] = '.';
+    filename[1] = '/';
+
+    time_t raw_time;
+    time(&raw_time);
+
+    struct tm* current_time = localtime(&raw_time);
+    strftime(&filename[2], len-2, "%Y%m%d_%H%M%S", current_time);
+}
+
+
 int main(int argc, char *argv[])
 {
     hs_datalog_initialize();
@@ -287,10 +300,72 @@ int main(int argc, char *argv[])
 
     auto dict = action_get_available_tag();
 
-    if (reader.is_open()) action_send_message(reader);
+    if (reader.is_open())
+        action_send_message(reader);
 
     std::map<std::tuple<int,string>, bool> tags;
-    if (FEATURE_TAGGING) tags = action_read_tags();
+    if (FEATURE_TAGGING)
+        tags = action_read_tags();
+
+    // TODO: Create a file and allocate buffers
+    std::vector<vector<string>> names;
+    std::vector<vector<FILE *>> pFiles;
+    std::vector<vector<int>> packetsReceived;
+
+    char foldername[256];
+    create_filename_from_current_time(foldername, 256);
+    mkdir(foldername, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+    int n_sensors;
+    int ret = hs_datalog_get_sensor_number(DEVICE_ID, &n_sensors);
+    if (ret == ST_HS_DATALOG_ERROR) {
+        cout << "Error occurred while retrieving sensor number\n";
+        cout << "Press any key to exit \n";
+        cin.get();
+        return EXIT_FAILURE;
+    }
+
+    std::vector<vector<bool>> is_sensor_active;
+
+    for (uint8_t sid = 0; sid < static_cast<uint8_t>(n_sensors); sid++)
+    {
+        names.push_back(std::vector<string>());
+        pFiles.push_back(std::vector<FILE*>());
+
+        char* sensor_name;
+        int ret = hs_datalog_get_sensor_name(DEVICE_ID, static_cast<int>(sid), &sensor_name);
+
+        int n_sub_sensors;
+        hs_datalog_get_sub_sensor_number(DEVICE_ID, static_cast<int>(sid), &n_sub_sensors);
+
+        is_sensor_active.push_back(std::vector<bool>());
+
+        for (uint8_t sub_sid = 0; sub_sid < static_cast<uint8_t>(n_sub_sensors); sub_sid++) {
+            char* sub_sensor_name;
+            hs_datalog_get_sub_sensor_name(DEVICE_ID, static_cast<int>(sid), static_cast<int>(sub_sid), &sub_sensor_name);
+
+            std::string identity = std::string(sensor_name) + "_" + std::string(sub_sensor_name);
+            names[sid].push_back(identity);
+
+            char* sub_sensor_status;
+            int ret = hs_datalog_get_subsensor_status(DEVICE_ID, sid, sub_sid, &sub_sensor_status);
+
+            auto json = nlohmann::json::parse(sub_sensor_status);
+
+            is_sensor_active[sid].push_back(json.at("isActive"));
+            FILE * tmp_f = nullptr;
+            if(is_sensor_active[sid][sub_sid])
+            {
+                std::string name =  string(foldername) + "/";
+                name.append(names[sid][sub_sid]);
+                name.append(".dat");
+                tmp_f = fopen(name.data(), "wb+");
+            }
+            pFiles[sid].push_back(tmp_f);
+        }
+    }
+
+    // TODO: Start logging
 
     return 0;
 }
