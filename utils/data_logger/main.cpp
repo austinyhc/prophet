@@ -137,6 +137,7 @@ action_get_available_tag() {
     return dict;
 }
 
+// TODO: Can I use unique pointer here are move the ownership to the caller
 char* read_file(std::ifstream& infile) {
 
     infile.seekg(0, std::ios::end);
@@ -164,7 +165,6 @@ void action_send_message(std::ifstream& infile) {
     auto json = nlohmann::json::parse(data);
 
     auto sensors = json.at("device").at("sensor");
-
     for (auto const& sensor : sensors) {
 
         auto sub_sensor_stat = sensor.at("sensorStatus").at("subSensorStatus");
@@ -174,8 +174,8 @@ void action_send_message(std::ifstream& infile) {
         cmd["command"] = "SET";
         cmd["sensorId"] = sensor.at("id");
 
-        auto stat_iter = sub_sensor_stat.begin();
-        auto desc_iter = sub_sensor_desc.begin();
+        auto stat_iter = std::begin(sub_sensor_stat);
+        auto desc_iter = std::begin(sub_sensor_desc);
 
         for (; stat_iter != sub_sensor_stat.end() &&
                desc_iter != sub_sensor_desc.end();
@@ -185,11 +185,8 @@ void action_send_message(std::ifstream& infile) {
             nlohmann::json params;
             params["id"] = sub_sensor_id;
 
-            // TODO: Change to range-based loop
-            auto it = stat_iter->begin();
-            auto end = stat_iter->end();
-            for(; it!=end; it++) {
-                params[it.key()] = it.value();
+            for (auto const& [key,val] : stat_iter->items()) {
+                params[key] = val;
             }
             cmd["subSensorStatus"].push_back(params);
         }
@@ -227,7 +224,6 @@ void action_send_message(std::ifstream& infile) {
 
     delete[] data;
 }
-
 
 int main(int argc, char *argv[])
 {
