@@ -29,10 +29,14 @@ $(BUILD_DIR)/Makefile: CMakeLists.txt
 	cmake \
 		-G "$(BUILD_SYSTEM)" \
 		-B$(BUILD_DIR) \
-		-DPROJECT_NAME=$(PROJECT_NAME)
+		-DPROJECT_NAME=$(PROJECT_NAME) \
+		-DCMAKE_BUILD_TYPE=Debug
 
 run: build DeviceConfig.json
 	$(EXECUTABLE) -f ./DeviceConfig.json -t 100
+
+test: build
+	$(EXECUTABLE)
 
 gdb: build $(EXECUTABLE)
 	gdb -q --args $(EXECUTABLE) -f ./DeviceConfig.json -t 100

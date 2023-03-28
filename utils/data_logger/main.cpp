@@ -1,20 +1,18 @@
 /**
   ******************************************************************************
-  * @file    main.c
-  * @author  SRA
-  * @brief   source code of command line example of High Speed Datalog
-  ******************************************************************************
-  * @attention
+  * @file    main.cpp
+  * @author  Austin Chen
+  * @brief   source file of `data_logger` command line tool
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2022 Austin Chen
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  *
   ******************************************************************************
+ **/
   */
 #include "main.h"
 
@@ -400,3 +398,22 @@ int _kbhit() {
     return bytesWaiting;
 }
 #endif
+bool getInput(char* c)
+{
+#ifdef __linux__
+    if (_kbhit())
+    {
+        *c = getc(stdin);
+        return true; // Key Was Hit
+    }
+    return false; // No keys were pressed
+#elif _WIN32
+    if (_kbhit())
+    {
+        *c = getch();
+        return true; // Key Was Hit
+    }
+    return false; // No keys were pressed
+#endif
+}
+

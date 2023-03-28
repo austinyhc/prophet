@@ -9,6 +9,7 @@ set(CMAKE_BUILD_TYPE Debug)
 add_executable(${PROJECT_NAME} "main.cpp" "main.h")
 
 set(INCLUDE_DIRECTROIES
+    ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/deps/dbg
     ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/deps/cxxopts
     ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/deps/nlohmann
     ${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/deps/hsd)

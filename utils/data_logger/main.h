@@ -1,21 +1,18 @@
 /**
   ******************************************************************************
-  * @file    main.c
-  * @author  SRA
-  * @brief   header file of command line example of High Speed Datalog
-  ******************************************************************************
-  * @attention
+  * @file    main.h
+  * @author  Austin Chen
+  * @brief   header file of `data_logger` command line tool
   *
-  * Copyright (c) 2022 STMicroelectronics.
+  * Copyright (c) 2022 Austin Chen
   * All rights reserved.
   *
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
-  *
   ******************************************************************************
-  */
+ **/
 
 #include <stdint.h>
 #include <iostream>
