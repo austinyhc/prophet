@@ -62,7 +62,8 @@ set(DRIVER_INCLUDE_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/iis2dh
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/components/iis3dwb
     ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cpu
-    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/dsp
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/STM32_USB_Device_Library/Class/SensorStreaming_WCID/Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/STM32_USB_Device_Library/Core/Inc
     ${CMAKE_CURRENT_SOURCE_DIR}/middleware/st/BlueNRG-2/includes
@@ -108,13 +109,13 @@ target_compile_definitions(${EXECUTABLE} PRIVATE
     ${MCU_MODEL}
     USE_HAL_DRIVER
     ARM_MATH_CM4
+    __FPU_PRESENT=1
     USE_HAL_DFSDM_REGISTER_CALLBACKS
     USE_HAL_ADC_REGISTER_CALLBACKS
     USE_HAL_SAI_REGISTER_CALLBACKS
     USE_HAL_SPI_REGISTER_CALLBACKS
     USE_HAL_I2C_REGISTER_CALLBACKS
-    USE_HAL_TIM_REGISTER_CALLBACKS
-    ONBOARD_DIGITAL_MIC)
+    USE_HAL_TIM_REGISTER_CALLBACKS)
 
 target_include_directories(${EXECUTABLE} SYSTEM PRIVATE
     ${DRIVER_INCLUDE_DIRECTORIES})
@@ -148,11 +149,15 @@ target_link_options(${EXECUTABLE} PRIVATE
     -Wl,-Map=${CMAKE_PROJECT_NAME}.map
     $<$<VERSION_GREATER:$<C_COMPILER_VERSION>,10.3.1>:-Wl,--no-warn-rwx-segments>
     -Wl,--start-group
+    -u _printf_float
     -lc
     -lm
     -lstdc++
     -Wl,--end-group
     -Wl,--print-memory-usage)
+
+target_link_libraries(${EXECUTABLE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/cmsis/lib/libarm_cortexM4lf_math.a)
 ###############################################################################
 
 # The last command can take a couple of seconds on larger project, usefull for debugging
