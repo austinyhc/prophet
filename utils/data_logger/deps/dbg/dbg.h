@@ -1,14 +1,10 @@
 #include <bits/stdc++.h>
-#include <unordered_map>
 
 #define fastio() std::ios_base::sync_with_stdio(false); std::cin.tie(NULL); std::cout.tie(NULL)
 #define MOD 1000000007
 #define MOD1 998244353
 #define INF 1e18
 #define nline "\n"
-#define pb push_back
-#define ppb pop_back
-#define mp make_pair
 #define PI 3.141592653589793238462
 #define set_bits __builtin_popcountll
 #define sz(x) ((int)(x).size())
@@ -19,7 +15,7 @@ typedef unsigned long long ull;
 typedef long double lld;
 
 #ifndef ONLINE_JUDGE
-#define dbg(x) std::cout << #x <<" "; _print(x); std::cout << endl;
+#define dbg(x) std::cout << #x << " "; _print(x); std::cout << endl;
 #else
 #define dbg(x)
 #endif
