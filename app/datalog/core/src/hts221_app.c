@@ -1,23 +1,17 @@
 /**
- ******************************************************************************
- * @file    hts221_app.c
- * @author  SRA - MCD
- *
- *
- * @brief   This file provides a set of functions to handle hts221 sensor
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file    hts221_app.c
+  * @author  Austin Chen
+  * @brief   This file provides a set of functions to handle hts221 sensor
+  * Copyright (c) 2022 Austin Chen
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+ **/
 
 /* Includes ------------------------------------------------------------------*/
 #include "hts221_app.h"
@@ -52,6 +46,7 @@ static osSemaphoreDef(hts221_data_read_cmplt_sem);
 
 static sensor_handle_t hts221_hdl_instance = {
     HTS221_ID, HTS221_I2C_ADDRESS, NULL, 0, &hts221_data_read_cmplt_sem_id};
+
 static stmdev_ctx_t hts221_ctx_instance = {
     SM_I2C_Write_Os, SM_I2C_Read_Os, &hts221_hdl_instance};
 
@@ -96,8 +91,7 @@ void HTS221_Peripheral_Init(void)
 void HTS221_OS_Init(void)
 {
     /* Data read complete semaphore initialization */
-    hts221_data_read_cmplt_sem_id =
-        osSemaphoreCreate(osSemaphore(hts221_data_read_cmplt_sem), 1);
+    hts221_data_read_cmplt_sem_id = osSemaphoreCreate(osSemaphore(hts221_data_read_cmplt_sem), 1);
     osSemaphoreWait(hts221_data_read_cmplt_sem_id, osWaitForever);
 
     /* Data ready interrupt semaphore initialization */
@@ -111,6 +105,7 @@ void HTS221_OS_Init(void)
         HSD_HTS221_THREAD_PRIO,
         1,
         configMINIMAL_STACK_SIZE);
+
     /* Start thread */
     HTS221_Thread_Id = osThreadCreate(osThread(HTS221_Acquisition_Thread), NULL);
 }

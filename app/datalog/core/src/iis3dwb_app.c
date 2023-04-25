@@ -19,7 +19,6 @@
  ******************************************************************************
  */
 
-/* Includes ------------------------------------------------------------------*/
 #include "iis3dwb_app.h"
 #include "iis3dwb_reg.h"
 #include "HSDCore.h"
@@ -30,10 +29,6 @@
 /* Private includes ----------------------------------------------------------*/
 #define WRITE_BUFFER_SIZE_IIS3DWB (uint32_t)(32768)
 
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 static int32_t s_nIIS3DWB_id = 0;
 
 static uint8_t iis3dwb_mem[IIS3DWB_MAX_SAMPLES_PER_IT * 7];
@@ -163,8 +158,7 @@ static void IIS3DWB_Thread(void const* argument)
         {
             osSemaphoreWait(iis3dwb_data_ready_sem_id, osWaitForever);
 
-            if (IIS3DWB_Sensor_State
-                == SM_SENSOR_STATE_RUNNING) /* Change of state can happen while task blocked */
+            if (IIS3DWB_Sensor_State == SM_SENSOR_STATE_RUNNING) /* Change of state can happen while task blocked */
             {
                 /* Check FIFO_WTM_IA anf fifo level. We do not use PID in order to avoid
                  * reading one register twice */

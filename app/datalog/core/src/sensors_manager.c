@@ -1,25 +1,19 @@
 /**
- ******************************************************************************
- * @file    sensors_manager.c
- * @author  SRA - MCD
- *
- *
- * @brief   This file provides a set of functions to handle the sensors
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file    sensors_manager.c
+  * @author  Austin Chen
+  * @brief   This source file provides a set of functions to manage the sensors
+  *
+  * Copyright (c) 2022 Austin Chen
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+ **/
 
-/* Includes ------------------------------------------------------------------*/
 #include "sensors_manager.h"
 #include "HSDCore.h"
 #include "HSD_tags.h"
@@ -41,14 +35,7 @@ osSemaphoreDef(spiThreadSem);
 osSemaphoreId i2cThreadSem_id;
 osSemaphoreDef(i2cThreadSem);
 
-/* Private includes ----------------------------------------------------------*/
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
-
 #define SM_TS_UPDATE_PERIOD_S (10)
-
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
 
 SPI_HandleTypeDef hsm_spi;
 I2C_HandleTypeDef hsm_i2c;
@@ -58,7 +45,6 @@ DMA_HandleTypeDef hdma_sm_spi_tx;
 DMA_HandleTypeDef hdma_sm_spi_rx;
 TIM_HandleTypeDef hsm_tim;
 
-/* Private function prototypes -----------------------------------------------*/
 static void SM_DMA_Init(void);
 static void SM_I2C_Init(void);
 static void SM_I2C_MspInit(I2C_HandleTypeDef* hi2c);
@@ -68,6 +54,7 @@ static void SM_I2C_ErrorCallback(I2C_HandleTypeDef* I2cHandle);
 static void SM_SPI_Init(void);
 static void SM_SPI_MspInit(SPI_HandleTypeDef* hspi);
 static void SM_SPI_TxRxCpltCallback(SPI_HandleTypeDef* hspi);
+
 void SM_TIM_Init(void);
 
 osMessageQId spiReqQueue_id;
@@ -83,7 +70,8 @@ static void i2c_Thread(void const* argument);
 osThreadId i2cThreadId;
 
 osPoolId spiPool_id;
-osPoolDef(spiPool, 100, SM_Message_t);
+
+const osPoolDef_t os_pool_def_spiPool = {(100), sizeof(SM_Message_t), ((void*)0)};
 
 osPoolId i2cPool_id;
 osPoolDef(i2cPool, 100, SM_Message_t);
@@ -110,7 +98,7 @@ static void SM_SPI_Init(void)
     hsm_spi.Init.CLKPhase = SPI_PHASE_2EDGE;
     hsm_spi.Init.NSS = SPI_NSS_SOFT;
     hsm_spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
-        /*SPI running @ 10 MHz */ /*stwin*/
+    /*SPI running @ 10 MHz */ /*stwin*/
     hsm_spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
     hsm_spi.Init.TIMode = SPI_TIMODE_DISABLE;
     hsm_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -138,9 +126,11 @@ void SM_Error_Handler(void)
 }
 
 /**
- * @brief Sensor manager OS functionalities initialization: for each BUS (I2C and SPI) it
- *        initializes a queue to collect read request, a thread (blocking on the queue) to
- * handle read requests and a semaphore used to wait for DMA transfer complete
+ * @brief Initializatoin of Sensor Manager OS functionalities.
+ * @details
+ * for each I2C and SPI, it initializes a queue to collect read request,
+ * a thread (blocking on the queue) to handle read requests and
+ * a semaphore used to wait for the completion of a DMA transfer.
  * @param None
  * @retval None
  */
@@ -160,6 +150,7 @@ void SM_OS_Init(void)
     spiReqQueue_id = osMessageCreate(osMessageQ(spireqqueue), NULL);
     i2cReqQueue_id = osMessageCreate(osMessageQ(i2creqqueue), NULL);
 
+    // TODO: Think hard what was my intention of doing this.
     vQueueAddToRegistry(spiReqQueue_id, "spiReqQueue_id");
 
     /* SPI read Thread*/
@@ -222,15 +213,7 @@ int32_t SM_SPI_Read(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
         ((sensor_handle_t*)handle)->GPIOx, ((sensor_handle_t*)handle)->GPIO_Pin, GPIO_PIN_SET);
     return 0;
 }
-/**
- * @brief  SPI read function: it adds a request on the SPI read queue (which will be handled by
- * the SPI read thread)
- * @param  argument not used
- * @note when the function is used and linked to the sensor context, all the calls made by the
- * PID driver will result in a call to this function. If this is the case, be sure to make all
- * the calls to the PID driver functions from a freeRTOS thread
- * @retval None
- */
+
 int32_t SM_SPI_Read_Os(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
 {
     uint8_t autoInc = 0x00;
@@ -398,13 +381,12 @@ int32_t SM_I2C_Read(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
 int32_t SM_I2C_Write(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
 {
     taskENTER_CRITICAL();
+
     uint8_t autoInc = 0x00;
 
-    if (((sensor_handle_t*)handle)->WhoAmI == 0xBCU
-        && len > 1) /*enable HTS221 auto increment*/
-    {
+    /* Enable HTS221 auto increment*/
+    if (((sensor_handle_t*)handle)->WhoAmI == 0xBCU && len > 1)
         autoInc = 0x80;
-    }
 
     HAL_I2C_Mem_Write(
         &hsm_i2c,
@@ -414,6 +396,7 @@ int32_t SM_I2C_Write(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
         data,
         len,
         1000);
+
     taskEXIT_CRITICAL();
 
     return 0;
@@ -474,15 +457,6 @@ static void i2c_Thread(void const* argument)
     }
 }
 
-/**
- * @brief  I2C read function: it adds a request on the I2C read queue (which will be handled by
- * the I2C read thread)
- * @param  argument not used
- * @retval None
- * @note when the function is used and linked to the sensor context, all the calls made by the
- * PID driver will result in a call to this function. If this is the case, be sure to make all
- * the calls to the PID driver functions from a freeRTOS thread
- */
 int32_t SM_I2C_Read_Os(void* handle, uint8_t reg, uint8_t* data, uint16_t len)
 {
     SM_Message_t* msg;
@@ -954,19 +928,3 @@ uint8_t SM_StopSensorThread(uint8_t sId)
     }
     return 0;
 }
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */

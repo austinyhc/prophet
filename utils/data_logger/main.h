@@ -47,21 +47,3 @@ static constexpr struct {
     DLOGGER__VERSION_MINOR,
     DLOGGER__VERSION_PATCH
 };
-
-bool getInput(char *c) {
-#ifdef __linux__
-    if (_kbhit())
-    {
-        *c = getc(stdin);
-        return true; // Key Was Hit
-    }
-    return false; // No keys were pressed
-#elif _WIN32
-    if (_kbhit())
-    {
-        *c = getch();
-        return true; // Key Was Hit
-    }
-    return false; // No keys were pressed
-#endif
-}

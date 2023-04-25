@@ -1,23 +1,18 @@
 /**
- ******************************************************************************
- * @file    sensors_manager.h
- * @author  SRA - MCD
- *
- *
- * @brief   Header for sensors_manager.c module.
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2022 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- *
- ******************************************************************************
- */
+  ******************************************************************************
+  * @file    sensors_manager.h
+  * @author  Austin Chen
+  * @brief   The header file of the sensors_manager.c
+  *
+  * Copyright (c) 2022 Austin Chen
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+ **/
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __SENSORS_MANAGER_H

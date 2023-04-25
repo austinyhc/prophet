@@ -13,7 +13,7 @@
   *
   ******************************************************************************
  **/
-  */
+
 #include "main.h"
 
 #include <cstdlib>
@@ -25,6 +25,7 @@
 #include "hsd.h"
 #include "json.hpp"
 #include "cxxopts.hpp"
+#include "dbg.h"
 
 using std::vector;
 using std::string;
@@ -226,7 +227,6 @@ void action_send_message(std::ifstream& infile) {
     delete[] data;
 }
 
-
 std::map<std::tuple<int,string>, bool>
 action_read_tags() {
     std::map<std::tuple<int,string>, bool> tags;
@@ -294,6 +294,7 @@ int main(int argc, char *argv[])
 
     uint32_t timeout_seconds = result["t"].as<uint32_t>();
 
+    fastio();
     action_print_device_descriptor();
 
     auto dict = action_get_available_tag();
@@ -351,6 +352,15 @@ int main(int argc, char *argv[])
             auto json = nlohmann::json::parse(sub_sensor_status);
 
             is_sensor_active[sid].push_back(json.at("isActive"));
+            dbg(is_sensor_active);
+
+            std::unordered_map<std::string,int> dict;
+            dict.insert({"Sean",4});
+            dict.insert({"Gemma",1});
+            dict.insert({"Fran", 35});
+            dict.insert({"Austin", 37});
+            dbg(dict);
+
             FILE * tmp_f = nullptr;
             if(is_sensor_active[sid][sub_sid])
             {
@@ -383,7 +393,7 @@ int _kbhit() {
     static const int STDIN = 0;
     static bool initialized = false;
 
-    if (! initialized) {
+    if (!initialized) {
         // Use termios to turn off line buffering
         termios term;
         tcgetattr(STDIN, &term);
@@ -398,8 +408,8 @@ int _kbhit() {
     return bytesWaiting;
 }
 #endif
-bool getInput(char* c)
-{
+
+bool getInput(char* c) {
 #ifdef __linux__
     if (_kbhit())
     {

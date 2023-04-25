@@ -15,7 +15,7 @@ typedef unsigned long long ull;
 typedef long double lld;
 
 #ifndef ONLINE_JUDGE
-#define dbg(x) std::cout << #x << " "; _print(x); std::cout << endl;
+#define dbg(x) std::cout << #x << " "; _print(x); std::cout << std::endl;
 #else
 #define dbg(x)
 #endif

@@ -767,13 +767,12 @@ sys_error_code_t StartStop_AutoMode(void)
 {
     sys_error_code_t xRes = SYS_NO_ERROR_CODE;
 
-    if (AMTIsStarted())
-    {
+    if (AMTIsStarted()) {
+
         StopExecutionPhases();
         xRes = AMTaskAbortAutoMode(g_pxAMtaskObj);
-    }
-    else
-    {
+
+    } else {
         xRes = AMTaskStartExecutioPlan(g_pxAMtaskObj);
     }
 
@@ -796,21 +795,15 @@ void GetMLCOut(uint8_t* mlcOutBuffer)
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    switch (GPIO_Pin)
-    {
+    switch (GPIO_Pin) {
     case USER_BUTTON_PIN:
-        if (HAL_GetTick() - t_click <= 1000)
-        {
-            return; /* avoid two clicks that are too close to each other. */
-        }
+        /* avoid two clicks that are too close to each other. */
+        if (HAL_GetTick() - t_click <= 1000) return;
 
-        if (StartStop_AutoMode() == SYS_NO_ERROR_CODE)
-        {
-            /* Enter here if AutoMode configuration exists and is valid */
-            return;
-        }
-        else
-        {
+        // NOTE: What is the AutoMode configuration?
+        /* Enter here if AutoMode configuration exists and is valid */
+        if (StartStop_AutoMode() == SYS_NO_ERROR_CODE) return;
+        else {
             /* No valid AutoMode configuration, usual procedure */
             if (com_status == HS_DATALOG_IDLE)
             {
@@ -819,28 +812,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
                 {
                     Error_Handler();
                 }
-
-#if (HSD_BLE_ENABLE == 1)
                 osMessagePut(bleSendThreadQueue_id, COM_REQUEST_STATUS_LOGGING, 0);
-#endif
             }
             else if (com_status == HS_DATALOG_SD_STARTED)
             {
                 StopExecutionPhases();
-#if (HSD_BLE_ENABLE == 1)
                 osMessagePut(bleSendThreadQueue_id, COM_REQUEST_STATUS_LOGGING, 0);
-#endif
             }
             t_click = HAL_GetTick();
         }
         break;
-#if (HSD_BLE_ENABLE == 1)
+
     case BLE_CM_SPI_EXTI_PIN:
-    {
         hci_tl_lowlevel_isr();
-    }
-    break;
-#endif
+        break;
+
     default:
         break;
     }

@@ -5,7 +5,7 @@ PREFIX = arm-none-eabi-
 CC = $(PREFIX)gcc
 CP = $(PREFIX)objcopy
 SZ = $(PREFIX)size
-BIN = $(CP) -O binary -S
+BIN = $(CP) -O binary
 
 all: simple.bin
 

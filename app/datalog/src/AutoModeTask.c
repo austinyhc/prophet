@@ -3,7 +3,6 @@
  * @file    AutoModeTask.c
  * @author  SRA
  *
- *
  * @brief
  ******************************************************************************
  * @attention
@@ -14,7 +13,6 @@
  * This software is licensed under terms that can be found in the LICENSE file
  * in the root directory of this software component.
  * If no LICENSE file comes with this software, it is provided AS-IS.
- *
  *
  ******************************************************************************
  */
@@ -403,21 +401,18 @@ sys_error_code_t AMTaskAbortAutoMode(AMTask* _this)
 boolean_t AMTaskIsStarted(AMTask* _this)
 {
     assert_param(_this);
-
     return _this->m_eState == E_AM_STATE_STARTED ? True : False;
 }
 
 boolean_t AMTaskIsNotStarted(AMTask* _this)
 {
     assert_param(_this);
-
     return _this->m_eState == E_AM_STATE_NOT_STARTED ? True : False;
 }
 
 boolean_t AMTaskIsEnded(AMTask* _this)
 {
     assert_param(_this);
-
     return _this->m_eState == E_AM_STATE_ENDED ? True : False;
 }
 
